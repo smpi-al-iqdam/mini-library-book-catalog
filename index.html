@@ -39,7 +39,8 @@ footer{background:#294765;color:#e9e1d3;padding:35px 0;margin-top:30px}.footer-i
     <button data-page="catalog" onclick="go('catalog')">Koleksi Buku</button>
     <button data-page="journal" onclick="go('journal')">Jurnal Membaca</button>
     <button data-page="about" onclick="go('about')">Tentang</button>
-    <button data-page="admin" onclick="go('admin')">Kelola Koleksi</button>
+    <button id="adminNavButton" data-page="admin" onclick="go('admin')" style="display:none">Kelola Koleksi</button>
+    <button id="authButton" onclick="loginAdmin()">Login Admin</button>
   </nav>
 </div></header>
 <main>
@@ -224,12 +225,25 @@ async function logoutAdmin(){
   currentUser = null;
   location.reload();
 }
+function updateAuthUI(){
+  const authButton = document.getElementById("authButton");
+  const adminNavButton = document.getElementById("adminNavButton");
 
+  if(!authButton || !adminNavButton) return;
+
+  const isAdmin = !!currentUser &&
+    currentUser.email.toLowerCase() === ADMIN_EMAIL;
+
+  adminNavButton.style.display = isAdmin ? "" : "none";
+  authButton.textContent = isAdmin ? "Keluar Admin" : "Login Admin";
+  authButton.onclick = isAdmin ? logoutAdmin : loginAdmin;
+  }
 async function checkAdminSession(){
   const { data, error } = await supabaseClient.auth.getUser();
 
   if(error || !data.user){
     currentUser = null;
+    updateAuthUI();
     return;
   }
 
@@ -238,12 +252,14 @@ async function checkAdminSession(){
   if(email !== ADMIN_EMAIL){
     await supabaseClient.auth.signOut();
     currentUser = null;
+    updateAuthUI();
     toast("Akun ini tidak memiliki akses admin.");
     return;
   }
 
   currentUser = data.user;
-                      }
+  updateAuthUI();
+  }
 init();
 </script>
 </body></html>
