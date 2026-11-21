@@ -185,8 +185,83 @@ function deleteJournal(i){if(confirm("Hapus catatan membaca ini?")){journal.spli
 function renderAdmin(){document.getElementById("adminCount").textContent=`(${books.length})`;document.getElementById("adminList").innerHTML=books.map(b=>`<div class="admin-row"><div><strong>${esc(b.title)}</strong><small>${esc(b.author)}</small></div><div class="admin-actions"><button class="icon-btn" onclick="editBook(${b.id})">Edit</button><button class="icon-btn danger" onclick="deleteBook(${b.id})">Hapus</button></div></div>`).join("");document.getElementById("bookCategory").innerHTML=categories.map(c=>`<option>${c}</option>`).join("")}
 function resetBookForm(){document.getElementById("bookForm").reset();document.getElementById("editId").value="";document.getElementById("adminFormTitle").textContent="Tambah buku baru"}
 function editBook(id){let b=books.find(x=>x.id===id);if(!b)return;document.getElementById("editId").value=id;for(let [k,v] of [["bookTitle",b.title],["bookAuthor",b.author],["bookCategory",b.category],["bookDescription",b.description],["bookWhy",b.why],["bookMoment",b.moment],["bookMoods",(b.moods||[]).join(", ")],["bookQuestion",b.question],["bookSource",b.source]])document.getElementById(k).value=v||"";document.getElementById("adminFormTitle").textContent="Edit: "+b.title;window.scrollTo({top:0,behavior:"smooth"})}
-function saveBook(e){e.preventDefault();let id=Number(document.getElementById("editId").value)||Date.now();let old=books.find(x=>x.id===id);let file=document.getElementById("bookCover").files[0];let data={id,title:document.getElementById("bookTitle").value.trim(),author:document.getElementById("bookAuthor").value.trim(),category:document.getElementById("bookCategory").value,description:document.getElementById("bookDescription").value,why:document.getElementById("bookWhy").value,moment:document.getElementById("bookMoment").value,moods:document.getElementById("bookMoods").value.split(",").map(x=>x.trim().toLowerCase()).filter(Boolean),question:document.getElementById("bookQuestion").value,source:document.getElementById("bookSource").value,cover:old?.cover||""};if(file){if(file.size>1500000){toast("Sampul terlalu besar. Gunakan gambar di bawah 1,5 MB.");return}let reader=new FileReader();reader.onload=()=>{data.cover=reader.result;commitBook(data,old)};reader.readAsDataURL(file)}else commitBook(data,old)}
-function commitBook(data,old){if(old)books=books.map(x=>x.id===data.id?data:x);else books.push(data);persist();resetBookForm();renderAdmin();renderFeatured();renderCatalog();toast("Data buku berhasil disimpan.")}
+async function saveBook(e){
+  e.preventDefault();
+
+  if(!currentUser || currentUser.email.toLowerCase()!==ADMIN_EMAIL){
+    toast("Akses admin diperlukan.");
+    return;
+  }
+
+  let id=Number(document.getElementById("editId").value)||Date.now();
+  let old=books.find(x=>x.id===id);
+  let file=document.getElementById("bookCover").files[0];
+
+  let data={
+    id,
+    title:document.getElementById("bookTitle").value.trim(),
+    author:document.getElementById("bookAuthor").value.trim(),
+    category:document.getElementById("bookCategory").value,
+    description:document.getElementById("bookDescription").value,
+    why:document.getElementById("bookWhy").value,
+    moment:document.getElementById("bookMoment").value,
+    moods:document.getElementById("bookMoods").value.split(",").map(x=>x.trim().toLowerCase()).filter(Boolean),
+    question:document.getElementById("bookQuestion").value,
+    source:document.getElementById("bookSource").value,
+    cover:old?.cover||""
+  };
+
+  if(file){
+    if(file.size>1500000){
+      toast("Sampul terlalu besar. Gunakan gambar di bawah 1,5 MB.");
+      return;
+    }
+
+    const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,"-");
+    const path=`${id}-${Date.now()}-${safeName}`;
+
+    const {error:uploadError}=await supabaseClient
+      .storage.from("book-covers")
+      .upload(path,file,{upsert:false});
+
+    if(uploadError){
+      console.error("Gagal mengunggah sampul:",uploadError);
+      toast("Gagal mengunggah sampul.");
+      return;
+    }
+
+    const {data:urlData}=supabaseClient
+      .storage.from("book-covers")
+      .getPublicUrl(path);
+
+    data.cover=urlData.publicUrl;
+  }
+
+  await commitBook(data,old);
+  }
+  async function commitBook(data,old){
+  const { error } = old
+    ? await supabaseClient.from("books").update(data).eq("id",data.id)
+    : await supabaseClient.from("books").insert(data);
+
+  if(error){
+    console.error("Gagal menyimpan buku:",error);
+    toast("Gagal menyimpan buku ke database.");
+    return;
+  }
+
+  if(old){
+    books=books.map(x=>x.id===data.id?data:x);
+  }else{
+    books.push(data);
+  }
+
+  resetBookForm();
+  renderAdmin();
+  renderFeatured();
+  renderCatalog();
+  toast("Data buku berhasil disimpan.");
+}
 function deleteBook(id){let b=books.find(x=>x.id===id);if(confirm(`Hapus "${b.title}" dari koleksi?`)){books=books.filter(x=>x.id!==id);persist();renderAdmin();renderFeatured();renderCatalog();toast("Buku dihapus.")}}
 function exportData(){let blob=new Blob([JSON.stringify({books,journal},null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="the-reading-space-backup.json";a.click();URL.revokeObjectURL(a.href)}
 function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let d=JSON.parse(r.result);if(!Array.isArray(d.books))throw Error();if(confirm("Impor akan mengganti koleksi dan jurnal pada browser ini. Lanjutkan?")){books=d.books;journal=Array.isArray(d.journal)?d.journal:[];persist();renderAdmin();renderFeatured();renderCatalog();toast("Data berhasil diimpor.")}}catch(err){toast("File JSON tidak valid.")}};r.readAsText(f);e.target.value=""}
