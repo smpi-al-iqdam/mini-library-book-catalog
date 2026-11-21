@@ -262,7 +262,37 @@ async function saveBook(e){
   renderCatalog();
   toast("Data buku berhasil disimpan.");
 }
-function deleteBook(id){let b=books.find(x=>x.id===id);if(confirm(`Hapus "${b.title}" dari koleksi?`)){books=books.filter(x=>x.id!==id);persist();renderAdmin();renderFeatured();renderCatalog();toast("Buku dihapus.")}}
+async function deleteBook(id){
+  if(!currentUser || currentUser.email.toLowerCase()!==ADMIN_EMAIL){
+    toast("Akses admin diperlukan.");
+    return;
+  }
+
+  let b=books.find(x=>x.id===id);
+
+  if(!b) return;
+
+  if(confirm(`Hapus "${b.title}" dari koleksi?`)){
+    const {error}=await supabaseClient
+      .from("books")
+      .delete()
+      .eq("id",id);
+
+    if(error){
+      console.error("Gagal menghapus buku:",error);
+      toast("Gagal menghapus buku dari database.");
+      return;
+    }
+
+    books=books.filter(x=>x.id!==id);
+
+    renderAdmin();
+    renderFeatured();
+    renderCatalog();
+
+    toast("Buku berhasil dihapus dari koleksi online.");
+  }
+}
 function exportData(){let blob=new Blob([JSON.stringify({books,journal},null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="the-reading-space-backup.json";a.click();URL.revokeObjectURL(a.href)}
 function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let d=JSON.parse(r.result);if(!Array.isArray(d.books))throw Error();if(confirm("Impor akan mengganti koleksi dan jurnal pada browser ini. Lanjutkan?")){books=d.books;journal=Array.isArray(d.journal)?d.journal:[];persist();renderAdmin();renderFeatured();renderCatalog();toast("Data berhasil diimpor.")}}catch(err){toast("File JSON tidak valid.")}};r.readAsText(f);e.target.value=""}
 function toast(msg){let t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2500)}
