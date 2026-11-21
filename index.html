@@ -151,7 +151,21 @@ function persist(){localStorage.setItem("trs_books",JSON.stringify(books));local
 function esc(s=""){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function coverHTML(b){let colors=["linear-gradient(145deg,#30465b,#17283b)","linear-gradient(145deg,#b66b50,#713f36)","linear-gradient(145deg,#758575,#334b43)","linear-gradient(145deg,#c29b69,#72553a)","linear-gradient(145deg,#5b607a,#30364f)","linear-gradient(145deg,#9c806b,#51433c)"];let c=colors[(b.id-1)%colors.length];return `<div class="cover" style="background:${c}">${b.cover?`<img src="${b.cover}" alt="Sampul ${esc(b.title)}">`:`<span class="cover-title">${esc(b.title)}</span><span class="cover-author">${esc(b.author)}</span>`}</div>`}
 function card(b){return `<article class="book-card" onclick="openBook(${b.id})">${coverHTML(b)}<div class="book-info"><h3>${esc(b.title)}</h3><p>${esc(b.author)}</p><span class="tag">${esc(b.category)}</span></div></article>`}
-function go(page){document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(page)?.classList.add("active");document.querySelectorAll(".navlinks button").forEach(x=>x.classList.toggle("active",x.dataset.page===page));document.getElementById("navlinks").classList.remove("open");window.scrollTo({top:0,behavior:"smooth"});if(page==="catalog")renderCatalog();if(page==="journal")renderJournal();if(page==="admin")renderAdmin()}
+function go(page){
+  if(page==="admin" && (!currentUser || currentUser.email.toLowerCase()!==ADMIN_EMAIL)){
+    toast("Silakan login sebagai admin terlebih dahulu.");
+    return;
+  }
+
+  document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+  document.getElementById(page)?.classList.add("active");
+  document.querySelectorAll(".navlinks button").forEach(x=>x.classList.toggle("active",x.dataset.page===page));
+  document.getElementById("navlinks").classList.remove("open");
+  window.scrollTo({top:0,behavior:"smooth"});
+  if(page==="catalog")renderCatalog();
+  if(page==="journal")renderJournal();
+  if(page==="admin")renderAdmin();
+}
 function toggleMenu(){document.getElementById("navlinks").classList.toggle("open")}
 function searchHome(){let q=document.getElementById("homeSearch").value;go("catalog");document.getElementById("catalogSearch").value=q;renderCatalog()}
 function renderFeatured(){document.getElementById("featuredGrid").innerHTML=books.slice(0,4).map(card).join("");document.getElementById("recentGrid").innerHTML=books.slice(-6).reverse().map(card).join("")}
@@ -177,6 +191,7 @@ function exportData(){let blob=new Blob([JSON.stringify({books,journal},null,2)]
 function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let d=JSON.parse(r.result);if(!Array.isArray(d.books))throw Error();if(confirm("Impor akan mengganti koleksi dan jurnal pada browser ini. Lanjutkan?")){books=d.books;journal=Array.isArray(d.journal)?d.journal:[];persist();renderAdmin();renderFeatured();renderCatalog();toast("Data berhasil diimpor.")}}catch(err){toast("File JSON tidak valid.")}};r.readAsText(f);e.target.value=""}
 function toast(msg){let t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2500)}
 async function init(){
+  await checkAdminSession();
   await loadBooksFromSupabase();
 
   document.getElementById("categoryFilter").innerHTML =
@@ -190,6 +205,45 @@ async function init(){
   randomQuestion();
   renderJournal();
 }
+async function loginAdmin(){
+  const { error } = await supabaseClient.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: window.location.origin + window.location.pathname
+    }
+  });
+
+  if(error){
+    console.error("Login gagal:", error);
+    toast("Login Google gagal.");
+  }
+}
+
+async function logoutAdmin(){
+  await supabaseClient.auth.signOut();
+  currentUser = null;
+  location.reload();
+}
+
+async function checkAdminSession(){
+  const { data, error } = await supabaseClient.auth.getUser();
+
+  if(error || !data.user){
+    currentUser = null;
+    return;
+  }
+
+  const email = (data.user.email || "").toLowerCase();
+
+  if(email !== ADMIN_EMAIL){
+    await supabaseClient.auth.signOut();
+    currentUser = null;
+    toast("Akun ini tidak memiliki akses admin.");
+    return;
+  }
+
+  currentUser = data.user;
+                      }
 init();
 </script>
 </body></html>
