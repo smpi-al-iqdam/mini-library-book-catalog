@@ -101,6 +101,16 @@ footer{background:#294765;color:#e9e1d3;padding:35px 0;margin-top:30px}.footer-i
 <div class="toast" id="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+const SUPABASE_URL = "https://klskgeevjwwhbajtmbev.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_P617sU5hyuilH5KG0MUSgw_dE6iZac_";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
+const ADMIN_EMAIL = "muhammadkamil21062000@gmail.com";
+let currentUser = null;
 const categories=["Spiritualitas & Pemikiran Islam","Filsafat & Pengetahuan","Fiksi & Sastra","Pengembangan Diri & Kehidupan","Puisi & Refleksi"];
 const initialBooks=[
 {id:1,title:"Muhammadku Sayangku",author:"Edi Ah Iyubenu",category:categories[0],description:"Sebuah bacaan bertema kecintaan kepada Nabi Muhammad saw. Judul ini mengajak pembaca mendekati sosok Nabi melalui ruang cinta, penghormatan, dan perenungan.",why:"Untuk pembaca yang ingin memperdalam rasa cinta dan kedekatan batin kepada Rasulullah.",moment:"pagi yang tenang, waktu refleksi",moods:["spiritual","damai","refleksi"],question:"Bagaimana cinta kepada Nabi dapat hadir dalam pilihan dan perilaku sehari-hari?",source:""},
