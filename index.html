@@ -132,6 +132,21 @@ const initialBooks=[
 ];
 let books=load("trs_books",initialBooks), journal=load("trs_journal",[]);
 function load(k,f){try{let v=localStorage.getItem(k);return v?JSON.parse(v):structuredClone(f)}catch(e){return structuredClone(f)}}
+async function loadBooksFromSupabase(){
+  const { data, error } = await supabaseClient
+    .from("books")
+    .select("*")
+    .order("id");
+
+  if(error){
+    console.error("Gagal memuat buku:", error);
+    toast("Katalog online belum dapat dimuat.");
+    books = load("trs_books", initialBooks);
+    return;
+  }
+
+  books = data || [];
+}
 function persist(){localStorage.setItem("trs_books",JSON.stringify(books));localStorage.setItem("trs_journal",JSON.stringify(journal))}
 function esc(s=""){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function coverHTML(b){let colors=["linear-gradient(145deg,#30465b,#17283b)","linear-gradient(145deg,#b66b50,#713f36)","linear-gradient(145deg,#758575,#334b43)","linear-gradient(145deg,#c29b69,#72553a)","linear-gradient(145deg,#5b607a,#30364f)","linear-gradient(145deg,#9c806b,#51433c)"];let c=colors[(b.id-1)%colors.length];return `<div class="cover" style="background:${c}">${b.cover?`<img src="${b.cover}" alt="Sampul ${esc(b.title)}">`:`<span class="cover-title">${esc(b.title)}</span><span class="cover-author">${esc(b.author)}</span>`}</div>`}
