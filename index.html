@@ -176,7 +176,20 @@ function deleteBook(id){let b=books.find(x=>x.id===id);if(confirm(`Hapus "${b.ti
 function exportData(){let blob=new Blob([JSON.stringify({books,journal},null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="the-reading-space-backup.json";a.click();URL.revokeObjectURL(a.href)}
 function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let d=JSON.parse(r.result);if(!Array.isArray(d.books))throw Error();if(confirm("Impor akan mengganti koleksi dan jurnal pada browser ini. Lanjutkan?")){books=d.books;journal=Array.isArray(d.journal)?d.journal:[];persist();renderAdmin();renderFeatured();renderCatalog();toast("Data berhasil diimpor.")}}catch(err){toast("File JSON tidak valid.")}};r.readAsText(f);e.target.value=""}
 function toast(msg){let t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2500)}
-function init(){document.getElementById("categoryFilter").innerHTML='<option value="">Semua kategori</option>'+categories.map(c=>`<option>${c}</option>`).join("");renderFeatured();renderDiscover();renderCatalog();renderAdmin();randomQuestion();renderJournal()}
+async function init(){
+  await loadBooksFromSupabase();
+
+  document.getElementById("categoryFilter").innerHTML =
+    '<option value="">Semua kategori</option>' +
+    categories.map(c=>`<option>${c}</option>`).join("");
+
+  renderFeatured();
+  renderDiscover();
+  renderCatalog();
+  renderAdmin();
+  randomQuestion();
+  renderJournal();
+}
 init();
 </script>
 </body></html>
