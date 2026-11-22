@@ -507,7 +507,23 @@ footer{background:#294765;color:#e9e1d3;padding:35px 0;margin-top:30px}.footer-i
     <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary" type="submit">Simpan buku</button><button class="btn btn-outline" type="button" onclick="resetBookForm()">Kosongkan</button></div>
   </form></div>
   <div class="panel"><h2>Daftar buku <span id="adminCount"></span></h2><div class="admin-list" id="adminList"></div><div class="notice">Tips: unggah gambar sampul dengan ukuran file yang wajar. Jika gambar tidak diunggah, kartu akan memakai sampul tipografi sementara.</div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-outline btn-small" onclick="exportData()">Ekspor cadangan JSON</button><label class="btn btn-outline btn-small" for="importFile">Impor data JSON</label><input id="importFile" type="file" accept=".json,application/json" style="display:none" onchange="importData(event)"></div></div></div>
+  </div>
+
+  <!-- BOOK SUGGESTION MANAGER -->
+  <div class="panel" style="margin-top:24px">
+    <h2>Usulan Buku dari Pembaca</h2>
+    <p class="suggestion-caption">
+      Tinjau usulan pembaca dan tentukan status pengadaannya.
+    </p>
+
+    <div id="adminSuggestionList">
+      <p class="suggestion-empty">Memuat usulan buku...</p>
+    </div>
+  </div>
+
 </div></div>
+</div>
+</div>
 </main>
 <footer><div class="wrap footer-inner"><div><div class="footer-brand">THE READING SPACE</div><p>Find Your Book, Find Your Moment.<br>Ruang kecil untuk cerita dan pemikiran.</p></div><p>© 2026 THE READING SPACE<br>Made for curious minds & thoughtful moments.</p></div></footer>
 <div class="toast" id="toast"></div>
@@ -1037,6 +1053,116 @@ async function voteForBookSuggestion(id){
     await loadBookSuggestions();
   }
 }
+
+async function loadAdminBookSuggestions(){
+  const list = document.getElementById("adminSuggestionList");
+  if(!list) return;
+
+  if(!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL){
+    list.innerHTML = '<p class="suggestion-empty">Akses khusus admin.</p>';
+    return;
+  }
+
+  list.innerHTML = '<p class="suggestion-empty">Memuat usulan buku...</p>';
+
+  const { data, error } = await supabaseClient
+    .from("book_suggestions")
+    .select("id, title, author, reason, status, vote_count, created_at")
+    .order("created_at", { ascending: false });
+
+  if(error){
+    console.error("Gagal memuat usulan admin:", error.message);
+    list.innerHTML = '<p class="suggestion-empty">Usulan buku gagal dimuat.</p>';
+    return;
+  }
+
+  if(!data || data.length === 0){
+    list.innerHTML = '<p class="suggestion-empty">Belum ada usulan buku.</p>';
+    return;
+  }
+
+  const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+
+  const statusLabels = {
+    pending: "Menunggu Persetujuan",
+    approved: "Disetujui",
+    rejected: "Ditolak",
+    purchasing: "Sedang Diadakan",
+    available: "Sudah Tersedia"
+  };
+
+  list.innerHTML = data.map(book => `
+    <div class="suggestion-item">
+      <h4>${escapeHTML(book.title)}</h4>
+      <p>Penulis: ${escapeHTML(book.author || "Belum diketahui")}</p>
+      ${book.reason ? `<p>Alasan: ${escapeHTML(book.reason)}</p>` : ""}
+      <p>Jumlah dukungan: <strong>${Number(book.vote_count) || 0}</strong></p>
+      <p>Status saat ini: <strong>${statusLabels[book.status] || book.status}</strong></p>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+        <select
+          id="suggestionStatus${Number(book.id)}"
+          style="padding:9px;border:1px solid #ded8cc;border-radius:8px"
+        >
+          ${Object.entries(statusLabels).map(([value, label]) => `
+            <option value="${value}" ${book.status === value ? "selected" : ""}>
+              ${label}
+            </option>
+          `).join("")}
+        </select>
+
+        <button
+          class="btn btn-primary btn-small"
+          onclick="updateBookSuggestionStatus(${Number(book.id)})"
+        >
+          Simpan Status
+        </button>
+      </div>
+    </div>
+  `).join("");
+}
+
+async function updateBookSuggestionStatus(id){
+  const select = document.getElementById(`suggestionStatus${id}`);
+  if(!select) return;
+
+  const allowedStatuses = [
+    "pending",
+    "approved",
+    "rejected",
+    "purchasing",
+    "available"
+  ];
+
+  const status = select.value;
+
+  if(!allowedStatuses.includes(status)){
+    alert("Status tidak valid.");
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("book_suggestions")
+    .update({ status: status })
+    .eq("id", id);
+
+  if(error){
+    console.error("Gagal memperbarui status:", error.message);
+    alert("Status gagal diperbarui. Silakan coba lagi.");
+    return;
+  }
+
+  alert("Status usulan buku berhasil diperbarui.");
+
+  await loadAdminBookSuggestions();
+  await loadBookSuggestions();
+}
 async function init(){
   await checkAdminSession();
   await loadBooksFromSupabase();
@@ -1050,6 +1176,7 @@ async function init(){
   renderDiscover();
   renderCatalog();
   renderAdmin();
+  await loadAdminBookSuggestions();
   randomQuestion();
   renderJournal();
 }
