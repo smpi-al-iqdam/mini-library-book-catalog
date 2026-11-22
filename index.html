@@ -40,6 +40,7 @@ footer{background:#294765;color:#e9e1d3;padding:35px 0;margin-top:30px}.footer-i
     <button data-page="journal" onclick="go('journal')">Jurnal Membaca</button>
     <button data-page="about" onclick="go('about')">Tentang</button>
     <button id="adminNavButton" data-page="admin" onclick="go('admin')" style="display:none">Kelola Koleksi</button>
+    <button id="setPasswordButton" onclick="setAdminPassword()" style="display:none">Atur Password</button>
     <button id="authButton" onclick="loginAdmin()">Login Admin</button>
   </nav>
 </div></header>
@@ -313,6 +314,41 @@ async function init(){
   randomQuestion();
   renderJournal();
 }
+
+async function setAdminPassword(){
+  if(!currentUser){
+    toast("Silakan login sebagai admin terlebih dahulu.");
+    return;
+  }
+
+  const password = prompt("Buat password admin (minimal 12 karakter):");
+
+  if(!password) return;
+
+  if(password.length < 12){
+    toast("Password minimal 12 karakter.");
+    return;
+  }
+
+  const confirmation = prompt("Masukkan kembali password:");
+
+  if(password !== confirmation){
+    toast("Konfirmasi password tidak cocok.");
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.updateUser({
+    password: password
+  });
+
+  if(error){
+    console.error("Gagal mengatur password:", error);
+    toast("Gagal mengatur password.");
+    return;
+  }
+
+  toast("Password admin berhasil diperbarui.");
+}
 async function loginAdmin(){
   const { error } = await supabaseClient.auth.signInWithOAuth({
     provider: "google",
@@ -332,9 +368,11 @@ async function logoutAdmin(){
   currentUser = null;
   location.reload();
 }
+
 function updateAuthUI(){
   const authButton = document.getElementById("authButton");
   const adminNavButton = document.getElementById("adminNavButton");
+  const setPasswordButton = document.getElementById("setPasswordButton");
 
   if(!authButton || !adminNavButton) return;
 
@@ -342,9 +380,14 @@ function updateAuthUI(){
     currentUser.email.toLowerCase() === ADMIN_EMAIL;
 
   adminNavButton.style.display = isAdmin ? "" : "none";
+
+  if(setPasswordButton){
+    setPasswordButton.style.display = isAdmin ? "" : "none";
+  }
+
   authButton.textContent = isAdmin ? "Keluar Admin" : "Login Admin";
   authButton.onclick = isAdmin ? logoutAdmin : loginAdmin;
-  }
+}
 async function checkAdminSession(){
   const { data, error } = await supabaseClient.auth.getUser();
 
