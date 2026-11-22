@@ -169,6 +169,216 @@ footer{background:#294765;color:#e9e1d3;padding:35px 0;margin-top:30px}.footer-i
     padding: 32px 22px 22px;
   }
 }
+
+/* BOOK SUGGESTION SECTION */
+.suggestion-section {
+  margin-top: 70px;
+}
+
+.suggestion-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 28px 32px;
+  margin-bottom: 22px;
+  border-radius: 18px;
+  background: #263b4a;
+  color: #fff8ec;
+}
+
+.suggestion-intro h3 {
+  margin: 0 0 9px;
+  font-size: 22px;
+}
+
+.suggestion-intro p {
+  max-width: 540px;
+  margin: 0;
+  color: #e3d9ca;
+  line-height: 1.7;
+}
+
+.suggestion-symbol {
+  font-size: 54px;
+  flex-shrink: 0;
+}
+
+.suggestion-layout {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 22px;
+  align-items: start;
+}
+
+.suggestion-form-card,
+.suggestion-list-card {
+  padding: 26px;
+  background: #fffaf2;
+  border: 1px solid #e9e0d2;
+  border-radius: 16px;
+}
+
+.suggestion-form-card h3,
+.suggestion-list-card h3 {
+  margin: 0 0 8px;
+  color: #263b4a;
+  font-size: 19px;
+}
+
+.suggestion-caption {
+  color: #817b70;
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0 0 20px;
+}
+
+#bookSuggestionForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#bookSuggestionForm label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #35434b;
+  margin-top: 8px;
+}
+
+#bookSuggestionForm input,
+#bookSuggestionForm textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1px solid #ded8cc;
+  border-radius: 9px;
+  background: white;
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+}
+
+#bookSuggestionForm input:focus,
+#bookSuggestionForm textarea:focus {
+  border-color: #a16b4b;
+  box-shadow: 0 0 0 3px rgba(161,107,75,0.1);
+}
+
+#bookSuggestionForm textarea {
+  resize: vertical;
+  min-height: 95px;
+}
+
+#bookSuggestionForm button {
+  width: 100%;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.suggestion-message {
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 0;
+  min-height: 16px;
+}
+
+.suggestion-list-heading {
+  margin-bottom: 18px;
+}
+
+.suggestion-empty {
+  padding: 25px 12px;
+  text-align: center;
+  color: #898276;
+  font-size: 13px;
+  background: #f7f1e7;
+  border-radius: 10px;
+}
+
+.suggestion-item {
+  padding: 17px 0;
+  border-bottom: 1px solid #e9e0d2;
+}
+
+.suggestion-item:first-child {
+  padding-top: 0;
+}
+
+.suggestion-item:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.suggestion-item h4 {
+  color: #263b4a;
+  font-size: 16px;
+  margin: 0 0 5px;
+}
+
+.suggestion-item p {
+  color: #817b70;
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 5px 0;
+}
+
+.suggestion-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.suggestion-vote-button {
+  border: 1px solid #b77c59;
+  background: transparent;
+  color: #9c6243;
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.suggestion-vote-button:hover {
+  background: #f4e7d9;
+}
+
+.suggestion-vote-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.suggestion-vote-count {
+  color: #817b70;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+@media (max-width: 760px) {
+  .suggestion-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .suggestion-intro {
+    padding: 23px;
+  }
+
+  .suggestion-intro h3 {
+    font-size: 19px;
+  }
+
+  .suggestion-symbol {
+    font-size: 40px;
+  }
+
+  .suggestion-form-card,
+  .suggestion-list-card {
+    padding: 21px;
+  }
+}
 </style>
 </head>
 <body>
@@ -201,6 +411,64 @@ footer{background:#294765;color:#e9e1d3;padding:35px 0;margin-top:30px}.footer-i
   <section class="wrap"><div class="section-head"><div><div class="eyebrow">Perfect reading moment</div><h2>Temukan momen membacamu</h2><p>Setiap buku punya suasana. Kapan kamu ingin membacanya?</p></div></div><div class="moment-grid" id="momentGrid"></div></section>
   <section class="wrap"><div class="question-band"><div><div class="eyebrow">A question to ponder</div><h2 id="dailyQuestionTitle">Satu pertanyaan, satu ruang refleksi.</h2><p id="dailyQuestion">Apa satu hal yang ingin kamu pahami lebih dalam tentang dirimu hari ini?</p></div><button class="btn btn-outline" style="border-color:#c9bda9;color:#fff8ec" onclick="randomQuestion()">Pertanyaan lain ↗</button></div></section>
   <section class="wrap"><div class="section-head"><div><div class="eyebrow">Recently added</div><h2>Rak bacaanmu</h2><p>Enam belas judul untuk menemani perjalanan membaca.</p></div><button class="text-link" onclick="go('catalog')">Jelajahi rak →</button></div><div class="book-grid" id="recentGrid"></div></section>
+  
+  <!-- BOOK SUGGESTIONS -->
+  <section class="wrap suggestion-section">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Your voice matters</div>
+        <h2>Buku yang Ingin Dibaca</h2>
+        <p>Ikut menentukan bacaan berikutnya di Mini Library SMPI Al Iqdam.</p>
+      </div>
+    </div>
+
+    <div class="suggestion-intro">
+      <div>
+        <h3>Punya rekomendasi buku?</h3>
+        <p>Usulkan buku yang ingin kamu baca. Siapa tahu, buku pilihanmu akan menjadi koleksi berikutnya!</p>
+      </div>
+      <div class="suggestion-symbol">📚</div>
+    </div>
+
+    <div class="suggestion-layout">
+      <div class="suggestion-form-card">
+        <h3>Ajukan Buku</h3>
+        <p class="suggestion-caption">Ceritakan buku yang ingin kamu hadirkan di perpustakaan.</p>
+
+        <form id="bookSuggestionForm" onsubmit="submitBookSuggestion(event)">
+          <label for="suggestionTitle">Judul buku *</label>
+          <input id="suggestionTitle" type="text" maxlength="150"
+            placeholder="Masukkan judul buku" required>
+
+          <label for="suggestionAuthor">Nama penulis</label>
+          <input id="suggestionAuthor" type="text"
+            placeholder="Nama penulis (jika tahu)">
+
+          <label for="suggestionReason">Mengapa buku ini ingin kamu baca?</label>
+          <textarea id="suggestionReason" rows="4"
+            placeholder="Ceritakan alasan atau manfaat buku ini..."></textarea>
+
+          <button type="submit" id="suggestionSubmitButton" class="btn btn-primary">
+            Kirim Usulan Buku
+          </button>
+          <p id="suggestionFormMessage" class="suggestion-message"></p>
+        </form>
+      </div>
+
+      <div class="suggestion-list-card">
+        <div class="suggestion-list-heading">
+          <div>
+            <h3>Usulan Pembaca</h3>
+            <p class="suggestion-caption">Buku-buku yang sedang diperjuangkan pembaca.</p>
+          </div>
+        </div>
+
+        <div id="bookSuggestionList">
+          <p class="suggestion-empty">Memuat usulan buku...</p>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
 
 <div id="catalog" class="page"><div class="wrap"><div class="eyebrow">The collection</div><h1 class="page-title">Koleksi Buku</h1><p class="page-intro">Jelajahi seluruh koleksi THE READING SPACE. Cari berdasarkan judul atau penulis, saring berdasarkan kategori, lalu temukan buku yang menarik perhatianmu.</p>
@@ -439,9 +707,340 @@ async function deleteBook(id){
 function exportData(){let blob=new Blob([JSON.stringify({books,journal},null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="the-reading-space-backup.json";a.click();URL.revokeObjectURL(a.href)}
 function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let d=JSON.parse(r.result);if(!Array.isArray(d.books))throw Error();if(confirm("Impor akan mengganti koleksi dan jurnal pada browser ini. Lanjutkan?")){books=d.books;journal=Array.isArray(d.journal)?d.journal:[];persist();renderAdmin();renderFeatured();renderCatalog();toast("Data berhasil diimpor.")}}catch(err){toast("File JSON tidak valid.")}};r.readAsText(f);e.target.value=""}
 function toast(msg){let t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2500)}
+
+// BOOK SUGGESTIONS
+
+function escapeSuggestionText(value){
+  return String(value || "").replace(/[&<>"']/g, function(char){
+    return {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;"
+    }[char];
+  });
+}
+
+// Identitas anonim untuk satu browser
+function getSuggestionVoterKey(){
+  let key = localStorage.getItem("readingSpaceVoterKey");
+
+  if(!key){
+    key = crypto.randomUUID();
+    localStorage.setItem("readingSpaceVoterKey", key);
+  }
+
+  return key;
+}
+
+// Mengirim usulan buku
+async function submitBookSuggestion(event){
+  event.preventDefault();
+
+  const title = document.getElementById("suggestionTitle").value.trim();
+  const author = document.getElementById("suggestionAuthor").value.trim();
+  const reason = document.getElementById("suggestionReason").value.trim();
+
+  const message = document.getElementById("suggestionFormMessage");
+  const button = document.getElementById("suggestionSubmitButton");
+
+  if(title.length < 2){
+    message.textContent = "Judul buku minimal 2 karakter.";
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "Mengirim...";
+
+  const { error } = await supabaseClient
+    .from("book_suggestions")
+    .insert({
+      title: title,
+      author: author || null,
+      reason: reason || null
+    });
+
+  button.disabled = false;
+  button.textContent = "Kirim Usulan Buku";
+
+  if(error){
+    console.error("Gagal mengirim usulan:", error);
+
+    if(error.code === "23505"){
+      message.textContent = "Judul buku ini sudah pernah diusulkan.";
+    }else{
+      message.textContent = "Usulan gagal dikirim. Silakan coba lagi.";
+    }
+    return;
+  }
+
+  document.getElementById("bookSuggestionForm").reset();
+  message.textContent = "Terima kasih! Usulanmu berhasil dikirim dan menunggu pemeriksaan admin.";
+}
+
+// Memuat daftar usulan yang sudah disetujui
+async function loadBookSuggestions(){
+  const container = document.getElementById("bookSuggestionList");
+  if(!container) return;
+
+  const { data, error } = await supabaseClient
+    .from("book_suggestions")
+    .select("id, title, author, reason, status, vote_count")
+    .in("status", ["approved", "purchasing", "available"])
+    .order("vote_count", { ascending: false })
+    .order("created_at", { ascending: false });
+
+  if(error){
+    console.error("Gagal memuat usulan:", error);
+    container.innerHTML = '<p class="suggestion-empty">Usulan buku belum dapat dimuat.</p>';
+    return;
+  }
+
+  if(!data || data.length === 0){
+    container.innerHTML = '<p class="suggestion-empty">Belum ada usulan buku yang ditampilkan. Jadilah yang pertama mengusulkan!</p>';
+    return;
+  }
+
+  const statusLabels = {
+    approved: "Disetujui",
+    purchasing: "Dalam Pengadaan",
+    available: "Sudah Tersedia"
+  };
+
+  container.innerHTML = data.map(book => {
+    const id = Number(book.id);
+    const hasVoted = localStorage.getItem("readingSpaceVoted_" + id) === "yes";
+
+    return `
+      <div class="suggestion-item">
+        <h4>${escapeSuggestionText(book.title)}</h4>
+        <p>Penulis: ${escapeSuggestionText(book.author || "Belum diketahui")}</p>
+        ${book.reason ? `<p>${escapeSuggestionText(book.reason)}</p>` : ""}
+        <p>Status: ${statusLabels[book.status] || "Disetujui"}</p>
+
+        <div class="suggestion-meta">
+          <span class="suggestion-vote-count">
+            ♥ ${Number(book.vote_count)} dukungan
+          </span>
+
+          <button
+            class="suggestion-vote-button"
+            onclick="voteForBookSuggestion(${id}, this)"
+            ${hasVoted ? "disabled" : ""}
+          >
+            ${hasVoted ? "Sudah Mendukung ✓" : "♥ Saya Mendukung"}
+          </button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+// Memberikan dukungan
+async function voteForBookSuggestion(id, button){
+  const storageKey = "readingSpaceVoted_" + id;
+
+  if(localStorage.getItem(storageKey) === "yes"){
+    toast("Kamu sudah mendukung buku ini.");
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "Memproses...";
+
+  const { data, error } = await supabaseClient.rpc(
+    "vote_for_book_suggestion",
+    {
+      p_suggestion_id: Number(id),
+      p_voter_key: getSuggestionVoterKey()
+    }
+  );
+
+  if(error){
+    console.error("Gagal memberikan dukungan:", error);
+    button.disabled = false;
+    button.textContent = "♥ Saya Mendukung";
+    toast("Dukungan gagal dikirim. Silakan coba lagi.");
+    return;
+  }
+
+  if(data === true){
+    localStorage.setItem(storageKey, "yes");
+    toast("Terima kasih atas dukunganmu!");
+  }else{
+    localStorage.setItem(storageKey, "yes");
+    toast("Kamu sudah mendukung buku ini atau usulan tidak tersedia.");
+  }
+
+  await loadBookSuggestions();
+}
+
+async function loadBookSuggestions(){
+  const list = document.getElementById("bookSuggestionList");
+  if(!list) return;
+
+  list.innerHTML = '<p class="suggestion-empty">Memuat usulan buku...</p>';
+
+  const { data, error } = await supabaseClient
+    .from("book_suggestions")
+    .select("id, title, author, reason, status, vote_count, created_at")
+    .in("status", ["approved", "purchasing", "available"])
+    .order("vote_count", { ascending: false })
+    .order("created_at", { ascending: false });
+
+  if(error){
+    console.error("Gagal memuat usulan buku:", error.message);
+    list.innerHTML = '<p class="suggestion-empty">Usulan buku belum dapat dimuat.</p>';
+    return;
+  }
+
+  if(!data || data.length === 0){
+    list.innerHTML = '<p class="suggestion-empty">Belum ada usulan buku yang disetujui. Jadilah pembaca pertama yang mengusulkan!</p>';
+    return;
+  }
+
+  const votedIds = JSON.parse(
+    localStorage.getItem("readingSpaceVotedSuggestions") || "[]"
+  );
+
+  const statusLabels = {
+    approved: "Disetujui",
+    purchasing: "Dalam Pengadaan",
+    available: "Sudah Tersedia"
+  };
+
+  const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+
+  list.innerHTML = data.map(book => `
+    <div class="suggestion-item">
+      <h4>${escapeHTML(book.title)}</h4>
+      <p>Penulis: ${escapeHTML(book.author || "Belum diketahui")}</p>
+      ${book.reason ? `<p>${escapeHTML(book.reason)}</p>` : ""}
+      <div class="suggestion-meta">
+        <span class="suggestion-vote-count">
+          ♥ ${Number(book.vote_count) || 0} dukungan
+        </span>
+        <button
+          class="suggestion-vote-button"
+          onclick="voteForBookSuggestion(${Number(book.id)})"
+          ${votedIds.includes(Number(book.id)) ? "disabled" : ""}
+        >
+          ${votedIds.includes(Number(book.id)) ? "Sudah Mendukung" : "Saya Mendukung"}
+        </button>
+      </div>
+      <p>${statusLabels[book.status] || ""}</p>
+    </div>
+  `).join("");
+}
+
+async function submitBookSuggestion(event){
+  event.preventDefault();
+
+  const title = document.getElementById("suggestionTitle").value.trim();
+  const author = document.getElementById("suggestionAuthor").value.trim();
+  const reason = document.getElementById("suggestionReason").value.trim();
+  const message = document.getElementById("suggestionFormMessage");
+  const button = document.getElementById("suggestionSubmitButton");
+
+  message.textContent = "";
+
+  if(title.length < 2){
+    message.textContent = "Judul buku minimal 2 karakter.";
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "Mengirim...";
+
+  const { error } = await supabaseClient
+    .from("book_suggestions")
+    .insert({
+      title: title,
+      author: author || null,
+      reason: reason || null
+    });
+
+  button.disabled = false;
+  button.textContent = "Kirim Usulan Buku";
+
+  if(error){
+    console.error("Gagal mengirim usulan:", error.message);
+
+    if(error.code === "23505"){
+      message.textContent = "Judul buku ini sudah pernah diusulkan.";
+    }else{
+      message.textContent = "Usulan belum berhasil dikirim. Silakan coba lagi.";
+    }
+    return;
+  }
+
+  document.getElementById("bookSuggestionForm").reset();
+
+  message.textContent =
+    "Terima kasih! Usulanmu berhasil dikirim dan akan ditinjau oleh admin.";
+
+  await loadBookSuggestions();
+}
+
+function getSuggestionVoterKey(){
+  let key = localStorage.getItem("readingSpaceVoterKey");
+
+  if(!key){
+    key = crypto.randomUUID();
+    localStorage.setItem("readingSpaceVoterKey", key);
+  }
+
+  return key;
+}
+
+async function voteForBookSuggestion(id){
+  const voterKey = getSuggestionVoterKey();
+
+  const { data, error } = await supabaseClient.rpc(
+    "vote_for_book_suggestion",
+    {
+      p_suggestion_id: id,
+      p_voter_key: voterKey
+    }
+  );
+
+  if(error){
+    console.error("Gagal memberikan dukungan:", error.message);
+    alert("Dukungan belum berhasil dikirim. Silakan coba lagi.");
+    return;
+  }
+
+  if(data === true){
+    const votedIds = JSON.parse(
+      localStorage.getItem("readingSpaceVotedSuggestions") || "[]"
+    );
+
+    if(!votedIds.includes(Number(id))){
+      votedIds.push(Number(id));
+      localStorage.setItem(
+        "readingSpaceVotedSuggestions",
+        JSON.stringify(votedIds)
+      );
+    }
+
+    await loadBookSuggestions();
+    alert("Terima kasih! Dukunganmu berhasil dicatat.");
+  }else{
+    alert("Kamu sudah pernah mendukung buku ini atau usulan sudah tidak tersedia.");
+    await loadBookSuggestions();
+  }
+}
 async function init(){
   await checkAdminSession();
   await loadBooksFromSupabase();
+  await loadBookSuggestions();
 
   document.getElementById("categoryFilter").innerHTML =
     '<option value="">Semua kategori</option>' +
@@ -454,7 +1053,6 @@ async function init(){
   randomQuestion();
   renderJournal();
 }
-
 function loginAdmin(){
   const modal = document.getElementById("adminLoginModal");
   const errorMessage = document.getElementById("adminLoginError");
