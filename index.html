@@ -28,6 +28,147 @@ footer{background:#294765;color:#e9e1d3;padding:35px 0;margin-top:30px}.footer-i
 .toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--navy);color:white;padding:12px 18px;border-radius:999px;font-size:12px;z-index:99;transition:.25s}.toast.show{opacity:1;transform:translate(-50%,0)}
 @media(max-width:900px){.book-grid{grid-template-columns:repeat(3,1fr)}.catalog-grid{grid-template-columns:repeat(4,1fr)}.mood-grid,.moment-grid{grid-template-columns:repeat(2,1fr)}.hero-grid{grid-template-columns:1fr .7fr}.detail-layout{grid-template-columns:220px 1fr;gap:28px}}
 @media(max-width:650px){.wrap{width:min(100% - 28px,1160px)}.nav{height:66px}.menu-toggle{display:block}.navlinks{display:none;position:absolute;top:65px;left:0;right:0;background:var(--cream);padding:15px 22px 20px;border-bottom:1px solid var(--line);flex-direction:column;align-items:stretch;gap:4px}.navlinks.open{display:flex}.navlinks button{text-align:left;padding:11px}.brand{font-size:19px}.hero{padding:48px 0 35px}.hero-grid{grid-template-columns:1fr}.hero-art{height:235px;margin-top:-10px}.art-circle{width:205px;height:205px}.art-book{width:125px;height:176px}.art-book span{font-size:20px}.art-note{right:5%;bottom:10px}.hero h1{font-size:44px}.section-head{align-items:start;flex-direction:column}.featured{padding:18px}.book-grid{grid-template-columns:repeat(2,1fr);gap:15px}.catalog-grid{grid-template-columns:repeat(2,1fr);gap:17px}.cover .cover-title{font-size:16px}.question-band{grid-template-columns:1fr;padding:25px}.question-band .btn{justify-self:start}.detail-layout{grid-template-columns:1fr;gap:25px}.detail-cover .cover{max-width:210px;margin:auto}.detail-content h1{font-size:36px}.detail-panels{grid-template-columns:1fr}.journal-layout,.admin-grid,.about-grid{grid-template-columns:1fr}.footer-inner{align-items:start;flex-direction:column}.searchbar{border-radius:15px}.searchbar .btn{padding:11px 14px}.page{padding-top:30px}}
+
+/* ADMIN LOGIN MODAL */
+.login-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(24, 35, 43, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.login-card {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  background: #fffaf2;
+  border-radius: 20px;
+  padding: 36px 30px 25px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  animation: loginAppear 0.25s ease;
+}
+
+@keyframes loginAppear {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  border: 0;
+  background: none;
+  font-size: 28px;
+  color: #777;
+  cursor: pointer;
+}
+
+.login-heading {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.login-icon {
+  font-size: 35px;
+  margin-bottom: 10px;
+}
+
+.login-heading h2 {
+  margin: 0 0 8px;
+  color: #263b4a;
+  font-size: 23px;
+}
+
+.login-heading p {
+  margin: 0;
+  color: #a16b4b;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+}
+
+.login-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.login-card form label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #35434b;
+  margin-top: 8px;
+}
+
+.login-card input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px 14px;
+  border: 1px solid #ded8cc;
+  border-radius: 9px;
+  background: white;
+  font: inherit;
+  outline: none;
+}
+
+.login-card input:focus {
+  border-color: #a16b4b;
+  box-shadow: 0 0 0 3px rgba(161,107,75,0.12);
+}
+
+.password-field {
+  display: flex;
+  gap: 7px;
+}
+
+.password-field input {
+  flex: 1;
+  min-width: 0;
+}
+
+.password-field button {
+  border: 1px solid #ded8cc;
+  border-radius: 9px;
+  background: white;
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+.login-error {
+  color: #b83232;
+  font-size: 12px;
+  min-height: 16px;
+  margin: 2px 0;
+}
+
+.login-card form .btn {
+  width: 100%;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.login-footer {
+  text-align: center;
+  color: #888;
+  font-size: 11px;
+  margin-top: 22px;
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 32px 22px 22px;
+  }
+}
 </style>
 </head>
 <body>
@@ -313,31 +454,79 @@ async function init(){
   randomQuestion();
   renderJournal();
 }
-async function loginAdmin(){
-  const username = prompt("Masukkan username admin:");
-  if(!username) return;
 
-  const password = prompt("Masukkan password admin:");
-  if(!password) return;
+function loginAdmin(){
+  const modal = document.getElementById("adminLoginModal");
+  const errorMessage = document.getElementById("adminLoginError");
 
-  if(username.trim().toLowerCase() !== "admin"){
-    toast("Username atau password salah.");
+  if(!modal) return;
+
+  errorMessage.textContent = "";
+  document.getElementById("adminUsername").value = "";
+  document.getElementById("adminPassword").value = "";
+  document.getElementById("adminPassword").type = "password";
+
+  modal.style.display = "flex";
+}
+
+function closeAdminLogin(){
+  document.getElementById("adminLoginModal").style.display = "none";
+}
+
+function toggleAdminPassword(){
+  const passwordInput = document.getElementById("adminPassword");
+  const button = passwordInput.nextElementSibling;
+
+  if(passwordInput.type === "password"){
+    passwordInput.type = "text";
+    button.textContent = "Sembunyikan";
+  }else{
+    passwordInput.type = "password";
+    button.textContent = "Lihat";
+  }
+}
+
+async function submitAdminLogin(event){
+  event.preventDefault();
+
+  const username = document.getElementById("adminUsername").value.trim();
+  const password = document.getElementById("adminPassword").value;
+  const errorMessage = document.getElementById("adminLoginError");
+  const submitButton = document.getElementById("adminLoginSubmit");
+
+  errorMessage.textContent = "";
+
+  if(username.toLowerCase() !== "admin"){
+    errorMessage.textContent = "Username atau password salah.";
     return;
   }
+
+  submitButton.disabled = true;
+  submitButton.textContent = "Memeriksa...";
 
   const { data, error } = await supabaseClient.auth.signInWithPassword({
     email: ADMIN_EMAIL,
     password: password
   });
 
+  submitButton.disabled = false;
+  submitButton.textContent = "Masuk sebagai Admin";
+
   if(error){
     console.error("Login admin gagal:", error.message);
-    toast("Username atau password salah.");
+    errorMessage.textContent = "Username atau password salah.";
+    return;
+  }
+
+  if(data.user.email.toLowerCase() !== ADMIN_EMAIL){
+    await supabaseClient.auth.signOut();
+    errorMessage.textContent = "Akun tidak memiliki akses admin.";
     return;
   }
 
   currentUser = data.user;
   updateAuthUI();
+  closeAdminLogin();
   toast("Berhasil masuk sebagai admin.");
 }
 async function logoutAdmin(){
@@ -384,4 +573,47 @@ async function checkAdminSession(){
   }
 init();
 </script>
+
+<div id="adminLoginModal" class="login-modal" style="display:none">
+  <div class="login-card">
+    <button type="button" class="login-close" onclick="closeAdminLogin()">×</button>
+
+    <div class="login-heading">
+      <div class="login-icon">📚</div>
+      <h2>Administrator Login</h2>
+      <p>THE READING SPACE · MINI LIBRARY</p>
+    </div>
+
+    <form id="adminLoginForm" onsubmit="submitAdminLogin(event)">
+      <label for="adminUsername">Username</label>
+      <input
+        type="text"
+        id="adminUsername"
+        placeholder="Masukkan username"
+        autocomplete="username"
+        required
+      >
+
+      <label for="adminPassword">Password</label>
+      <div class="password-field">
+        <input
+          type="password"
+          id="adminPassword"
+          placeholder="Masukkan password"
+          autocomplete="current-password"
+          required
+        >
+        <button type="button" onclick="toggleAdminPassword()">Lihat</button>
+      </div>
+
+      <p id="adminLoginError" class="login-error"></p>
+
+      <button type="submit" id="adminLoginSubmit" class="btn btn-primary">
+        Masuk sebagai Admin
+      </button>
+    </form>
+
+    <div class="login-footer">Akses khusus pengelola mini library</div>
+  </div>
+</div>
 </body></html>
