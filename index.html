@@ -349,20 +349,34 @@ async function setAdminPassword(){
 
   toast("Password admin berhasil diperbarui.");
 }
+
 async function loginAdmin(){
-  const { error } = await supabaseClient.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: window.location.origin + window.location.pathname
-    }
+  const username = prompt("Masukkan username admin:");
+  if(!username) return;
+
+  const password = prompt("Masukkan password admin:");
+  if(!password) return;
+
+  if(username.trim().toLowerCase() !== "admin"){
+    toast("Username atau password salah.");
+    return;
+  }
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email: ADMIN_EMAIL,
+    password: password
   });
 
   if(error){
-    console.error("Login gagal:", error);
-    toast("Login Google gagal.");
+    console.error("Login admin gagal:", error.message);
+    toast("Username atau password salah.");
+    return;
   }
-}
 
+  currentUser = data.user;
+  updateAuthUI();
+  toast("Berhasil masuk sebagai admin.");
+}
 async function logoutAdmin(){
   await supabaseClient.auth.signOut();
   currentUser = null;
